@@ -1,0 +1,174 @@
+# residential.yaml
+# ----------------
+# Tipologías de departamentos residenciales para el BIM Generator.
+# Cada tipología define la composición de ambientes con superficies y
+# dimensiones de referencia. Estas son las plantillas por defecto;
+# el usuario puede modificarlas desde el panel de Tipologías.
+#
+# Formato:
+#   id: identificador único (debe coincidir con TipoUnidad enum)
+#   nombre: nombre visible en la UI
+#   ambientes: lista de ambientes con tipo, superficie y ancho mínimo
+#   superficie_total_ref_m2: referencia para la ficha técnica
+
+tipologias:
+
+  - id: monoambiente
+    nombre: "Monoambiente"
+    descripcion: "Unidad compacta de un solo ambiente integrado."
+    superficie_total_ref_m2: 32.0
+    ambientes:
+      - tipo: living_comedor
+        superficie_m2: 18.0
+        ancho_min_m: 3.5
+        iluminacion_natural: true
+        ventilacion_natural: true
+      - tipo: cocina
+        superficie_m2: 5.0
+        ancho_min_m: 2.0
+        iluminacion_natural: false
+        ventilacion_natural: true
+      - tipo: banio
+        superficie_m2: 3.5
+        ancho_min_m: 1.5
+        iluminacion_natural: false
+        ventilacion_natural: true
+      - tipo: circulacion_interna
+        superficie_m2: 3.0
+        ancho_min_m: 0.9
+        iluminacion_natural: false
+        ventilacion_natural: false
+      - tipo: balcon
+        superficie_m2: 2.5
+        ancho_min_m: 1.5
+        iluminacion_natural: true
+        ventilacion_natural: true
+
+  - id: 2_ambientes
+    nombre: "2 Ambientes"
+    descripcion: "Departamento de 1 dormitorio + living-comedor."
+    superficie_total_ref_m2: 48.0
+    ambientes:
+      - tipo: dormitorio_simple
+        superficie_m2: 10.0
+        ancho_min_m: 2.8
+        iluminacion_natural: true
+        ventilacion_natural: true
+      - tipo: living_comedor
+        superficie_m2: 18.0
+        ancho_min_m: 3.5
+        iluminacion_natural: true
+        ventilacion_natural: true
+      - tipo: cocina
+        superficie_m2: 6.5
+        ancho_min_m: 2.0
+        iluminacion_natural: false
+        ventilacion_natural: true
+      - tipo: banio
+        superficie_m2: 4.0
+        ancho_min_m: 1.5
+        iluminacion_natural: false
+        ventilacion_natural: true
+      - tipo: circulacion_interna
+        superficie_m2: 4.5
+        ancho_min_m: 0.9
+        iluminacion_natural: false
+        ventilacion_natural: false
+      - tipo: balcon
+        superficie_m2: 5.0
+        ancho_min_m: 1.5
+        iluminacion_natural: true
+        ventilacion_natural: true
+
+  - id: 3_ambientes
+    nombre: "3 Ambientes"
+    descripcion: "Departamento de 2 dormitorios + living-comedor."
+    superficie_total_ref_m2: 65.0
+    ambientes:
+      - tipo: dormitorio_principal
+        superficie_m2: 13.0
+        ancho_min_m: 3.0
+        iluminacion_natural: true
+        ventilacion_natural: true
+      - tipo: dormitorio_simple
+        superficie_m2: 9.5
+        ancho_min_m: 2.5
+        iluminacion_natural: true
+        ventilacion_natural: true
+      - tipo: living_comedor
+        superficie_m2: 20.0
+        ancho_min_m: 3.8
+        iluminacion_natural: true
+        ventilacion_natural: true
+      - tipo: cocina
+        superficie_m2: 7.0
+        ancho_min_m: 2.2
+        iluminacion_natural: false
+        ventilacion_natural: true
+      - tipo: banio
+        superficie_m2: 4.0
+        ancho_min_m: 1.5
+        iluminacion_natural: false
+        ventilacion_natural: true
+      - tipo: circulacion_interna
+        superficie_m2: 6.0
+        ancho_min_m: 0.9
+        iluminacion_natural: false
+        ventilacion_natural: false
+      - tipo: balcon
+        superficie_m2: 5.5
+        ancho_min_m: 1.8
+        iluminacion_natural: true
+        ventilacion_natural: true
+
+  - id: 4_ambientes
+    nombre: "4 Ambientes"
+    descripcion: "Departamento de 3 dormitorios + living-comedor."
+    superficie_total_ref_m2: 85.0
+    ambientes:
+      - tipo: dormitorio_principal
+        superficie_m2: 14.0
+        ancho_min_m: 3.2
+        iluminacion_natural: true
+        ventilacion_natural: true
+      - tipo: dormitorio_simple
+        superficie_m2: 10.0
+        ancho_min_m: 2.5
+        iluminacion_natural: true
+        ventilacion_natural: true
+      - tipo: dormitorio_simple
+        nombre_custom: "Dormitorio 3"
+        superficie_m2: 9.0
+        ancho_min_m: 2.5
+        iluminacion_natural: true
+        ventilacion_natural: true
+      - tipo: living_comedor
+        superficie_m2: 22.0
+        ancho_min_m: 4.0
+        iluminacion_natural: true
+        ventilacion_natural: true
+      - tipo: cocina
+        superficie_m2: 8.0
+        ancho_min_m: 2.5
+        iluminacion_natural: false
+        ventilacion_natural: true
+      - tipo: banio
+        superficie_m2: 4.5
+        ancho_min_m: 1.6
+        iluminacion_natural: false
+        ventilacion_natural: true
+      - tipo: toilette
+        superficie_m2: 2.5
+        ancho_min_m: 1.2
+        iluminacion_natural: false
+        ventilacion_natural: true
+      - tipo: circulacion_interna
+        superficie_m2: 8.0
+        ancho_min_m: 1.0
+        iluminacion_natural: false
+        ventilacion_natural: false
+      - tipo: balcon
+        superficie_m2: 7.0
+        ancho_min_m: 2.0
+        iluminacion_natural: true
+        ventilacion_natural: true

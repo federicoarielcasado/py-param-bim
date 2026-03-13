@@ -1,0 +1,27 @@
+# BIM Parametric Building Generator — Dependencias
+# Instalar con: pip install -r requirements.txt
+
+# --- Core ---
+pydantic>=2.0.0          # Motor de parámetros y validación de modelos
+
+# --- GUI ---
+PyQt6>=6.6.0             # Interfaz gráfica de escritorio (Windows)
+
+# --- Preview geométrica ---
+pyvista>=0.43.0          # Visualización 3D (wrappea VTK)
+vtk>=9.2.0               # Backend de renderizado
+pyvistaqt>=0.11.0        # Widget Qt para embeber pyvista en PyQt6
+
+# --- Configuración ---
+PyYAML>=6.0              # Lectura de archivos YAML (tipologías)
+
+# --- Testing ---
+pytest>=7.0.0            # Framework de tests
+pytest-qt>=4.0.0         # Soporte de tests con PyQt6
+
+# --- Reportes (Fase 3) ---
+# openpyxl>=3.1.0        # Generación de Excel (desbloquear en Fase 3)
+# reportlab>=4.0.0       # Generación de PDF (desbloquear en Fase 3)
+
+# --- Revit (Fase 3 — requiere Revit instalado) ---
+# pyrevit se instala con Revit; no se instala via pip

@@ -1,0 +1,19 @@
+# Normalizar line endings: LF en el repo, conversión automática en Windows
+* text=auto
+
+# Python — siempre LF
+*.py    text eol=lf
+
+# Configuración — siempre LF
+*.json  text eol=lf
+*.yaml  text eol=lf
+*.yml   text eol=lf
+*.ini   text eol=lf
+*.txt   text eol=lf
+*.md    text eol=lf
+
+# Binarios — sin conversión
+*.png   binary
+*.jpg   binary
+*.rvt   binary
+*.rfa   binary

@@ -1,0 +1,81 @@
+{
+  "_comentario": "Perfil normativo Argentina — Código Urbano CABA (vigente 2024) + CIRSOC 201",
+  "profile": "argentina_caba",
+  "ciudad": "Buenos Aires",
+  "pais": "Argentina",
+
+  "uso_suelo": {
+    "fos_max": 0.60,
+    "fot_max": 2.50,
+    "altura_max_m": null,
+    "_nota": "FOT y altura varían según zona (R1, R2, U, etc.). Estos valores son referencia zona R2b."
+  },
+
+  "retiros_minimos_m": {
+    "frontal": 3.0,
+    "lateral": 3.0,
+    "posterior": 3.0
+  },
+
+  "circulacion": {
+    "ancho_pasillo_min_m": 1.20,
+    "ancho_escalera_min_m": 1.20,
+    "max_distancia_evacuacion_m": 40.0,
+    "altura_libre_min_m": 2.40
+  },
+
+  "estructura": {
+    "norma_referencia": "CIRSOC 201-2005",
+    "altura_libre_minima_m": 2.40,
+    "espesor_losa_min_m": 0.12
+  },
+
+  "min_room_areas": {
+    "_comentario": "Superficies mínimas en m² según Código Urbano CABA Art. 4.3",
+    "dormitorio_simple":    9.0,
+    "dormitorio_principal": 12.0,
+    "living_comedor":       16.0,
+    "cocina":               6.0,
+    "banio":                3.5,
+    "toilette":             2.0,
+    "lavadero":             2.5,
+    "estudio":              6.0
+  },
+
+  "min_room_dimensions_m": {
+    "_comentario": "Ancho libre mínimo para cada tipo de ambiente",
+    "dormitorio_simple":    2.50,
+    "dormitorio_principal": 3.00,
+    "living_comedor":       3.50,
+    "cocina":               2.00,
+    "banio":                1.50,
+    "toilette":             1.20,
+    "lavadero":             1.50
+  },
+
+  "iluminacion_ventilacion": {
+    "_comentario": "Factor mínimo de abertura sobre superficie del ambiente",
+    "factor_iluminacion_min": 0.125,
+    "factor_ventilacion_min": 0.080,
+    "ambientes_habitables": [
+      "dormitorio_simple",
+      "dormitorio_principal",
+      "living_comedor",
+      "estudio"
+    ]
+  },
+
+  "tipologias_minimas": {
+    "_comentario": "Superficie total mínima por tipología de unidad",
+    "monoambiente":    28.0,
+    "2_ambientes":     42.0,
+    "3_ambientes":     58.0,
+    "4_ambientes":     72.0
+  },
+
+  "estacionamiento": {
+    "_comentario": "Cocheras obligatorias cada N unidades (zona R2b)",
+    "unidades_por_cochera": 1,
+    "aplica_desde_cantidad_unidades": 6
+  }
+}
