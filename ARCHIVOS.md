@@ -2,7 +2,7 @@
 
 > Este archivo se actualiza en cada sprint con los archivos nuevos o modificados.
 > Es la referencia rápida para encontrar dónde está implementada cada funcionalidad.
-> Última actualización: 13 de Marzo de 2026 | Versión: 0.1.0 (Fase 1 — scaffolding)
+> Última actualización: 13 de Marzo de 2026 | Versión: 0.2.0 (Fase 1 — Sprint 3: Panel Lote + Renderizador 2D)
 
 ---
 
@@ -53,7 +53,7 @@
 |---|---|---|
 | `motor.py` | ✅ **Implementado** | Coordina los renderizadores según la `SeccionActiva` (`MotorVista`). Define el enum `SeccionActiva` con todas las secciones del RF-02. Expone `al_cambiar` como callback hacia la GUI. |
 | `renderizadores/volumen.py` | ✅ **Implementado** | **Primer renderizador funcional.** Genera el volumen 3D del edificio como pyvista MultiBlock: plano de lote + boxes por planta (`RenderizadorVolumen`). |
-| `renderizadores/lote.py` | 🔲 Stub | Vista superior del lote (`RenderizadorLote`). Planificado para Sprint 4. |
+| `renderizadores/lote.py` | ✅ **Implementado** | Vista 2D cenital del lote (`RenderizadorLote`). Genera 4 capas: `lote_base`, `zona_retiros`, `zona_edificable`, `cotas`. Disparado por `SeccionActiva.LOTE`. |
 | `renderizadores/unidad.py` | 🔲 Stub | Planta interactiva de unidad funcional (`RenderizadorUnidad`). Planificado para Sprint 5. |
 | `renderizadores/estructura.py` | 🔲 Stub | Visualización de grilla estructural (`RenderizadorEstructura`). Planificado para Fase 2. |
 
@@ -64,10 +64,10 @@
 | Archivo | Estado | Descripción |
 |---|---|---|
 | `ventana_principal.py` | ✅ **Implementado** | **Ventana principal** (`VentanaPrincipal`). Layout de 3 columnas: barra lateral de navegación + panel de configuración + vista previa 3D. |
-| `widget_vista.py` | ✅ **Implementado** | Widget PyQt6 que embebe el plotter pyvista/VTK (`WidgetVista`). Recibe pv.MultiBlock del MotorVista y lo renderiza. |
+| `widget_vista.py` | ✅ **Implementado** | Widget PyQt6 que embebe el plotter pyvista/VTK (`WidgetVista`). Despacha automáticamente entre modo 3D (volumen) y modo 2D cenital (lote) según las claves del MultiBlock recibido. |
 | `paneles/panel_base.py` | ✅ **Implementado** | Clase base para todos los paneles (`PanelBase`). Define la señal `parametros_cambiados`, el método `cargar(proyecto)` y la property `seccion`. |
 | `paneles/panel_general.py` | ✅ **Implementado** | **Panel de parámetros generales** (`PanelGeneral`). Permite editar nombre, lote y edificio con métricas en tiempo real. |
-| `paneles/panel_lote.py` | 🔲 Stub | Panel de Lote / Implantación (`PanelLote`). Planificado para Sprint 3-4. |
+| `paneles/panel_lote.py` | ✅ **Implementado** | Panel de Lote e Implantación (`PanelLote`). Edita dimensiones del lote, retiros y normativa. Muestra métricas de implantación con semáforo visual de cumplimiento FOS/FOT. |
 | `paneles/panel_tipologias.py` | 🔲 Stub | Panel de Tipologías (`PanelTipologias`). Planificado para Sprint 4-5. |
 | `paneles/panel_unidad.py` | 🔲 Stub | Panel de Ambientes (`PanelUnidad`). Planificado para Sprint 5. |
 | `paneles/panel_circulacion.py` | 🔲 Stub | Panel de Circulación (`PanelCirculacion`). Planificado para Fase 2. |
@@ -110,6 +110,7 @@
 |---|---|---|
 | `prueba_motor_parametros.py` | ✅ **Implementado** | Pruebas del motor de parámetros. Cubre: Ambiente, Unidad, Planta, Lote, Edificio, Proyecto. Incluye pruebas de campos computados, predeterminados y roundtrip JSON. |
 | `prueba_validador.py` | ✅ **Implementado** | Pruebas del validador normativo. Cubre carga de perfil, validación FOS/FOT y superficies mínimas. |
+| `prueba_renderizadores.py` | ✅ **Implementado** | Pruebas de los renderizadores de vista previa. Cubre: `RenderizadorVolumen` (claves, geometría, retiros), `RenderizadorLote` (capas, dimensiones, casos borde) y `MotorVista` (despacho correcto por sección). |
 
 ---
 

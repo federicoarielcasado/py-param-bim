@@ -72,7 +72,7 @@ class RenderizadorVolumen:
         ])
         caras = np.array([4, 0, 1, 2, 3])
         mesh = pv.PolyData(puntos, caras)
-        mesh["tipo"] = ["lote"] * mesh.n_cells
+        mesh["tipo"] = [0] * mesh.n_cells   # 0 = lote (entero, VTK solo soporta ASCII en strings)
         return mesh
 
     def _generar_volumenes_plantas(self, proyecto: "Proyecto") -> "pv.MultiBlock":
@@ -96,7 +96,7 @@ class RenderizadorVolumen:
         for i, planta in enumerate(ed.plantas):
             alto = planta.altura_libre_m + ed.estructura.espesor_losa_m
             box  = pv.Box(bounds=(x0, x1, y0, y1, z_actual, z_actual + alto))
-            box["planta"] = [planta.nombre] * box.n_cells
+            box["numero_planta"] = [planta.numero] * box.n_cells  # entero — VTK solo soporta ASCII
             bloques[f"planta_{i}"] = box
             z_actual += alto
 
