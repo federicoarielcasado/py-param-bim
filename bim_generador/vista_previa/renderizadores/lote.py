@@ -72,7 +72,7 @@ class RenderizadorLote:
         "cotas_fondo"     → línea de cota del fondo del lote
     """
 
-    def renderizar(self, proyecto: "Proyecto") -> "pv.MultiBlock | None":
+    def renderizar(self, proyecto: "Proyecto", contexto=None) -> "pv.MultiBlock | None":
         if not PYVISTA_DISPONIBLE:
             return None
 

@@ -33,7 +33,7 @@ class RenderizadorVolumen:
     Retorna un pv.MultiBlock listo para agregar a un plotter pyvista.
     """
 
-    def renderizar(self, proyecto: "Proyecto") -> "pv.MultiBlock | None":
+    def renderizar(self, proyecto: "Proyecto", contexto=None) -> "pv.MultiBlock | None":
         """
         Genera el conjunto de meshes para la vista previa volumétrica.
 

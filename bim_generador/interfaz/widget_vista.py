@@ -5,17 +5,22 @@ Widget PyQt6 que embebe el visualizador pyvista/VTK en la ventana principal.
 
 Se actualiza automáticamente cuando el MotorVista dispara al_cambiar.
 
-Soporta dos modos de visualización que se configuran automáticamente
+Soporta tres modos de visualización que se configuran automáticamente
 según las claves presentes en el pv.MultiBlock recibido:
 
-  Modo 3D  (claves "lote" + "plantas"):
+  Modo 3D       (clave "plantas"):
     → Perspectiva. Rotación, zoom, pan libre.
     → Usado por: RenderizadorVolumen
 
-  Modo 2D  (claves "lote_base" + "zona_edificable"):
+  Modo 2D lote  (clave "lote_base"):
     → Proyección paralela, cámara cenital fija.
     → Pan y zoom habilitados; rotación deshabilitada.
     → Usado por: RenderizadorLote
+
+  Modo 2D unidad (clave "habitaciones"):
+    → Proyección paralela, cámara cenital fija.
+    → Habitaciones coloreadas por tipo con etiquetas flotantes.
+    → Usado por: RenderizadorUnidad
 """
 
 from __future__ import annotations
@@ -37,6 +42,34 @@ COLORES_PLANTAS = [
     "#4A90D9", "#5BA85F", "#E8A838", "#D95F5F",
     "#9B6BD4", "#4DBFBF", "#D96CB0", "#8B6F47",
 ]
+
+# Paleta de colores por tipo de ambiente (índice = TIPO_A_INT)
+COLORES_AMBIENTE = {
+    0: "#3A5F8A",   # dormitorio simple     — azul medio
+    1: "#1E3F6A",   # dormitorio principal  — azul oscuro
+    2: "#3D7A46",   # living comedor        — verde
+    3: "#8A6A1A",   # cocina                — marrón dorado
+    4: "#5B3A8A",   # baño                  — violeta
+    5: "#7A5AB8",   # toilette              — violeta claro
+    6: "#2A6A8A",   # lavadero              — azul gris
+    7: "#1A7A5A",   # estudio               — verde esmeralda
+    8: "#7A5A1A",   # balcón                — ocre
+    9: "#3A3A4A",   # circulación interna   — gris oscuro
+}
+
+# Nombres visibles para etiquetas de ambientes
+NOMBRES_AMBIENTE = {
+    0: "Dorm.",
+    1: "Dorm. Ppal.",
+    2: "Living",
+    3: "Cocina",
+    4: "Bano",
+    5: "Toilette",
+    6: "Lavadero",
+    7: "Estudio",
+    8: "Balcon",
+    9: "Circ.",
+}
 
 
 class WidgetVista(QWidget):
@@ -83,8 +116,11 @@ class WidgetVista(QWidget):
         self._plotter.clear()
         claves = list(multi_block.keys())
 
-        if "lote_base" in claves:
-            # Vista 2D — planta de implantación
+        if "habitaciones" in claves:
+            # Vista 2D — planta esquemática de unidad
+            self._renderizar_unidad_2d(multi_block)
+        elif "lote_base" in claves:
+            # Vista 2D — planta de implantación del lote
             self._renderizar_lote_2d(multi_block)
         else:
             # Vista 3D — volumen del edificio
@@ -261,6 +297,65 @@ class WidgetVista(QWidget):
                     show_points=False,
                     always_visible=True,
                 )
+
+    # -----------------------------------------------------------------------
+    # Modo 2D — planta esquemática de unidad funcional
+    # -----------------------------------------------------------------------
+
+    def _renderizar_unidad_2d(self, multi_block: "pv.MultiBlock") -> None:
+        """
+        Renderiza la planta esquemática de un departamento.
+
+        Cada habitación recibe el color de su tipo (COLORES_AMBIENTE).
+        Se agregan etiquetas flotantes con el nombre y área de cada ambiente.
+        """
+        if "habitaciones" in multi_block.keys():
+            habitaciones = multi_block["habitaciones"]
+            for nombre in habitaciones.keys():
+                mesh = habitaciones[nombre]
+                if mesh is None or mesh.n_cells == 0:
+                    continue
+
+                tipo_int = int(mesh.cell_data["tipo_int"][0]) if "tipo_int" in mesh.cell_data else 9
+                color    = COLORES_AMBIENTE.get(tipo_int, "#3A3A4A")
+
+                self._plotter.add_mesh(
+                    mesh,
+                    color=color,
+                    opacity=0.85,
+                    show_edges=True,
+                    edge_color="#C8D0E0",
+                    line_width=1.5,
+                )
+
+        # Etiquetas flotantes (nombre + área)
+        if "etiquetas" in multi_block.keys():
+            etiq = multi_block["etiquetas"]
+            if etiq is not None and etiq.n_points > 0 and "tipo_int" in etiq.point_data:
+                tipos_int = etiq.point_data["tipo_int"]
+                areas_m2  = etiq.point_data["area_m2"] if "area_m2" in etiq.point_data else None
+                labels = []
+                for i, t in enumerate(tipos_int):
+                    nombre_amb = NOMBRES_AMBIENTE.get(int(t), "Amb")
+                    if areas_m2 is not None:
+                        labels.append(f"{nombre_amb}\n{areas_m2[i]:.1f}m2")
+                    else:
+                        labels.append(nombre_amb)
+
+                self._plotter.add_point_labels(
+                    points=etiq.points,
+                    labels=labels,
+                    font_size=8,
+                    text_color="#FFFFFF",
+                    bold=False,
+                    show_points=False,
+                    always_visible=True,
+                )
+
+        # Cámara cenital con proyección paralela
+        self._plotter.enable_parallel_projection()
+        self._plotter.view_xy()
+        self._plotter.reset_camera()
 
     # -----------------------------------------------------------------------
     # Utilidades

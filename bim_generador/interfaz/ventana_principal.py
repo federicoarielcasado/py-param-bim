@@ -27,16 +27,17 @@ from bim_generador.vista_previa.motor         import MotorVista, SeccionActiva
 from bim_generador.interfaz.widget_vista      import WidgetVista
 
 # Paneles disponibles
-from bim_generador.interfaz.paneles.panel_general import PanelGeneral
-from bim_generador.interfaz.paneles.panel_lote    import PanelLote
+from bim_generador.interfaz.paneles.panel_general    import PanelGeneral
+from bim_generador.interfaz.paneles.panel_lote       import PanelLote
+from bim_generador.interfaz.paneles.panel_tipologias import PanelTipologias
 
 
 # Mapa: nombre visible → (clase del panel, SeccionActiva)
 SECCIONES: list[tuple[str, type, SeccionActiva]] = [
-    ("⚙ General",          PanelGeneral, SeccionActiva.GENERAL),
-    ("🏗 Lote",             PanelLote,    SeccionActiva.LOTE),
+    ("⚙ General",          PanelGeneral,    SeccionActiva.GENERAL),
+    ("🏗 Lote",             PanelLote,       SeccionActiva.LOTE),
+    ("🏠 Tipologías",       PanelTipologias, SeccionActiva.TIPOLOGIAS),
     # Los paneles siguientes se descomientan a medida que se implementan:
-    # ("🏠 Tipologías",    PanelTipologias,   SeccionActiva.TIPOLOGIAS),
     # ("🛋 Ambientes",      PanelUnidad,       SeccionActiva.AMBIENTES),
     # ("🚶 Circulación",   PanelCirculacion,  SeccionActiva.CIRCULACION),
     # ("🏛 Estructura",    PanelEstructura,   SeccionActiva.ESTRUCTURA),
@@ -301,8 +302,9 @@ class VentanaPrincipal(QMainWindow):
         nuevo_panel.show()
         self._panel_activo = nuevo_panel
 
-        # Cambiar el tipo de vista previa
-        self._motor.actualizar(self._proyecto, seccion)
+        # Cambiar el tipo de vista previa (con contexto del panel si lo tiene)
+        contexto = nuevo_panel.contexto_render
+        self._motor.actualizar(self._proyecto, seccion, contexto)
         self.statusBar().showMessage(f"Sección: {nombre}")
 
     # -----------------------------------------------------------------------
@@ -318,8 +320,9 @@ class VentanaPrincipal(QMainWindow):
         """Regenera la vista previa con la sección y proyecto actuales."""
         fila = self._barra_lateral.currentRow()
         if 0 <= fila < len(SECCIONES):
-            _, _, seccion = SECCIONES[fila]
-            self._motor.actualizar(self._proyecto, seccion)
+            nombre, _, seccion = SECCIONES[fila]
+            contexto = self._paneles[nombre].contexto_render if nombre in self._paneles else {}
+            self._motor.actualizar(self._proyecto, seccion, contexto)
         self.statusBar().showMessage("Listo")
 
     def _reiniciar_camara(self) -> None:

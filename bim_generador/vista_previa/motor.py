@@ -12,7 +12,7 @@ renderizador correspondiente a la sección activa (RF-02 del Claude.md).
 
 from __future__ import annotations
 from enum import Enum
-from typing import TYPE_CHECKING, Optional, Callable
+from typing import TYPE_CHECKING, Optional, Callable, Dict
 
 if TYPE_CHECKING:
     from bim_generador.nucleo.motor_parametros import Proyecto
@@ -50,10 +50,21 @@ class MotorVista:
         # Callback llamado cuando la vista previa está lista (actualiza el widget Qt)
         self.al_cambiar: Optional[Callable] = None
 
-    def actualizar(self, proyecto: "Proyecto", seccion: SeccionActiva) -> None:
+    def actualizar(
+        self,
+        proyecto: "Proyecto",
+        seccion: SeccionActiva,
+        contexto: Optional[dict] = None,
+    ) -> None:
         """
         Regenera la vista previa para el proyecto y la sección indicada.
         Llama a al_cambiar con la geometría resultante.
+
+        Args:
+            proyecto: Proyecto actual.
+            seccion:  Sección del panel activo.
+            contexto: Diccionario de contexto adicional para el renderizador
+                      (p.ej. {"unidad_idx": 1} para RenderizadorUnidad).
         """
         self._proyecto = proyecto
         self._seccion  = seccion
@@ -62,7 +73,7 @@ class MotorVista:
         if renderizador is None:
             return
 
-        geometria = renderizador.renderizar(proyecto)
+        geometria = renderizador.renderizar(proyecto, contexto)
         if self.al_cambiar:
             self.al_cambiar(geometria)
 
@@ -70,12 +81,13 @@ class MotorVista:
         """Devuelve el renderizador correspondiente a la sección activa."""
         from bim_generador.vista_previa.renderizadores.volumen import RenderizadorVolumen
         from bim_generador.vista_previa.renderizadores.lote    import RenderizadorLote
+        from bim_generador.vista_previa.renderizadores.unidad  import RenderizadorUnidad
 
         mapa = {
-            SeccionActiva.GENERAL: RenderizadorVolumen(),
-            SeccionActiva.LOTE:    RenderizadorLote(),
+            SeccionActiva.GENERAL:    RenderizadorVolumen(),
+            SeccionActiva.LOTE:       RenderizadorLote(),
+            SeccionActiva.TIPOLOGIAS: RenderizadorUnidad(),
             # Resto de renderizadores se agregan a medida que se implementan:
-            # SeccionActiva.TIPOLOGIAS:  RenderizadorUnidad(),
-            # SeccionActiva.ESTRUCTURA:  RenderizadorEstructura(),
+            # SeccionActiva.ESTRUCTURA: RenderizadorEstructura(),
         }
         return mapa.get(seccion)

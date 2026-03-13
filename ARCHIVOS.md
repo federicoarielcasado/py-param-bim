@@ -2,7 +2,7 @@
 
 > Este archivo se actualiza en cada sprint con los archivos nuevos o modificados.
 > Es la referencia rápida para encontrar dónde está implementada cada funcionalidad.
-> Última actualización: 13 de Marzo de 2026 | Versión: 0.2.0 (Fase 1 — Sprint 3: Panel Lote + Renderizador 2D)
+> Última actualización: 13 de Marzo de 2026 | Versión: 0.3.0 (Fase 1 — Sprint 4: Panel Tipologías + Renderizador Unidad 2D)
 
 ---
 
@@ -54,7 +54,7 @@
 | `motor.py` | ✅ **Implementado** | Coordina los renderizadores según la `SeccionActiva` (`MotorVista`). Define el enum `SeccionActiva` con todas las secciones del RF-02. Expone `al_cambiar` como callback hacia la GUI. |
 | `renderizadores/volumen.py` | ✅ **Implementado** | **Primer renderizador funcional.** Genera el volumen 3D del edificio como pyvista MultiBlock: plano de lote + boxes por planta (`RenderizadorVolumen`). |
 | `renderizadores/lote.py` | ✅ **Implementado** | Vista 2D cenital del lote (`RenderizadorLote`). Genera 4 capas: `lote_base`, `zona_retiros`, `zona_edificable`, `cotas`. Disparado por `SeccionActiva.LOTE`. |
-| `renderizadores/unidad.py` | 🔲 Stub | Planta interactiva de unidad funcional (`RenderizadorUnidad`). Planificado para Sprint 5. |
+| `renderizadores/unidad.py` | ✅ **Implementado** | Planta esquemática 2D de una unidad funcional (`RenderizadorUnidad`). Layout por zonas: balcón/social/privado/servicios/circulación. Acepta `contexto={"unidad_idx": N}`. Disparado por `SeccionActiva.TIPOLOGIAS`. |
 | `renderizadores/estructura.py` | 🔲 Stub | Visualización de grilla estructural (`RenderizadorEstructura`). Planificado para Fase 2. |
 
 ---
@@ -65,10 +65,10 @@
 |---|---|---|
 | `ventana_principal.py` | ✅ **Implementado** | **Ventana principal** (`VentanaPrincipal`). Layout de 3 columnas: barra lateral de navegación + panel de configuración + vista previa 3D. |
 | `widget_vista.py` | ✅ **Implementado** | Widget PyQt6 que embebe el plotter pyvista/VTK (`WidgetVista`). Despacha automáticamente entre modo 3D (volumen) y modo 2D cenital (lote) según las claves del MultiBlock recibido. |
-| `paneles/panel_base.py` | ✅ **Implementado** | Clase base para todos los paneles (`PanelBase`). Define la señal `parametros_cambiados`, el método `cargar(proyecto)` y la property `seccion`. |
+| `paneles/panel_base.py` | ✅ **Implementado** | Clase base para todos los paneles (`PanelBase`). Define la señal `parametros_cambiados`, el método `cargar(proyecto)`, la property `seccion` y la property `contexto_render` (dict vacío por defecto, sobreescribible). |
 | `paneles/panel_general.py` | ✅ **Implementado** | **Panel de parámetros generales** (`PanelGeneral`). Permite editar nombre, lote y edificio con métricas en tiempo real. |
 | `paneles/panel_lote.py` | ✅ **Implementado** | Panel de Lote e Implantación (`PanelLote`). Edita dimensiones del lote, retiros y normativa. Muestra métricas de implantación con semáforo visual de cumplimiento FOS/FOT. |
-| `paneles/panel_tipologias.py` | 🔲 Stub | Panel de Tipologías (`PanelTipologias`). Planificado para Sprint 4-5. |
+| `paneles/panel_tipologias.py` | ✅ **Implementado** | Panel de Tipologías de Unidades (`PanelTipologias`). Lista editable de unidades por planta (combo+quitar), botón agregar, spinner de previsualización, métricas de planta tipo. Expone `contexto_render` con `{"unidad_idx": N}`. |
 | `paneles/panel_unidad.py` | 🔲 Stub | Panel de Ambientes (`PanelUnidad`). Planificado para Sprint 5. |
 | `paneles/panel_circulacion.py` | 🔲 Stub | Panel de Circulación (`PanelCirculacion`). Planificado para Fase 2. |
 | `paneles/panel_estructura.py` | 🔲 Stub | Panel de Estructura (`PanelEstructura`). Planificado para Fase 2. |
@@ -110,7 +110,8 @@
 |---|---|---|
 | `prueba_motor_parametros.py` | ✅ **Implementado** | Pruebas del motor de parámetros. Cubre: Ambiente, Unidad, Planta, Lote, Edificio, Proyecto. Incluye pruebas de campos computados, predeterminados y roundtrip JSON. |
 | `prueba_validador.py` | ✅ **Implementado** | Pruebas del validador normativo. Cubre carga de perfil, validación FOS/FOT y superficies mínimas. |
-| `prueba_renderizadores.py` | ✅ **Implementado** | Pruebas de los renderizadores de vista previa. Cubre: `RenderizadorVolumen` (claves, geometría, retiros), `RenderizadorLote` (capas, dimensiones, casos borde) y `MotorVista` (despacho correcto por sección). |
+| `prueba_renderizadores.py` | ✅ **Implementado** | Pruebas de los renderizadores de vista previa. Cubre: `RenderizadorVolumen` (claves, geometría, retiros), `RenderizadorLote` (capas, dimensiones, casos borde) y `MotorVista` (despacho por sección, compatibilidad con contexto). |
+| `prueba_tipologias.py` | ✅ **Implementado** | Pruebas del Sprint 4. Cubre: `RenderizadorUnidad` (claves, habitaciones, etiquetas tipo_int/area_m2, casos borde), selección por contexto y `MotorVista` con contexto. |
 
 ---
 
@@ -148,8 +149,8 @@ py-param-bim/
     │   ├── motor.py                     ← Implementado ✅
     │   └── renderizadores/
     │       ├── volumen.py               ← Implementado ✅
-    │       ├── lote.py                  ← Stub
-    │       ├── unidad.py                ← Stub
+    │       ├── lote.py                  ← Implementado ✅
+    │       ├── unidad.py                ← Implementado ✅
     │       └── estructura.py            ← Stub
     ├── revit/
     │   ├── exportador.py                ← Stub (Fase 3)
@@ -160,8 +161,8 @@ py-param-bim/
     │   └── paneles/
     │       ├── panel_base.py            ← Implementado ✅
     │       ├── panel_general.py         ← Implementado ✅
-    │       ├── panel_lote.py            ← Stub
-    │       ├── panel_tipologias.py      ← Stub
+    │       ├── panel_lote.py            ← Implementado ✅
+    │       ├── panel_tipologias.py      ← Implementado ✅
     │       ├── panel_unidad.py          ← Stub
     │       ├── panel_circulacion.py     ← Stub
     │       ├── panel_estructura.py      ← Stub
@@ -177,5 +178,7 @@ py-param-bim/
     │   └── generador.py                 ← Stub (Fase 3)
 └── pruebas/
     ├── prueba_motor_parametros.py       ← Implementado ✅
-    └── prueba_validador.py              ← Implementado ✅
+    ├── prueba_validador.py              ← Implementado ✅
+    ├── prueba_renderizadores.py         ← Implementado ✅
+    └── prueba_tipologias.py             ← Implementado ✅
 ```

@@ -48,6 +48,15 @@ class PanelBase(QWidget):
         from bim_generador.vista_previa.motor import SeccionActiva
         return SeccionActiva.GENERAL  # sobreescribir en subclases
 
+    @property
+    def contexto_render(self) -> dict:
+        """
+        Contexto adicional para el renderizador de vista previa.
+        Sobreescribir en paneles que necesiten pasar datos extra
+        (p.ej. PanelTipologias pasa {"unidad_idx": N}).
+        """
+        return {}
+
     def cargar(self, proyecto: "Proyecto") -> None:
         """Carga los valores del proyecto en los controles del panel."""
         self._proyecto = proyecto

@@ -186,7 +186,8 @@ class PruebaMotorVista:
         resultados = []
         motor = MotorVista()
         motor.al_cambiar = lambda geom: resultados.append(geom)
-        motor.actualizar(proyecto_simple, SeccionActiva.TIPOLOGIAS)
+        # ESTRUCTURA todavía no tiene renderizador (Fase 2)
+        motor.actualizar(proyecto_simple, SeccionActiva.ESTRUCTURA)
         assert len(resultados) == 0
 
     def prueba_sin_callback_no_lanza_error(self, proyecto_simple):
