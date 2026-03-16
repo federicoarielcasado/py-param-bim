@@ -7,7 +7,7 @@ Coordina los renderizadores según la sección activa del panel de configuració
 Funciona completamente independiente de Revit; usa pyvista/VTK internamente.
 
 El motor responde a cambios en el Proyecto y delega el renderizado al
-renderizador correspondiente a la sección activa (RF-02 del Claude.md).
+renderizador correspondiente a la sección activa (RF-02).
 """
 
 from __future__ import annotations

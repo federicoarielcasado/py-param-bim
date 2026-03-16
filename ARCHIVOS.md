@@ -12,7 +12,6 @@
 |---|---|---|
 | `main.py` | ✅ Funcional | **Punto de entrada.** Inicializa QApplication y abre VentanaPrincipal. Ejecutar con `python main.py`. |
 | `requirements.txt` | ✅ Completo | Lista de dependencias Python. Instalar con `pip install -r requirements.txt`. |
-| `Claude.md` | ✅ Referencia | Documento de contexto del proyecto para agentes de IA. Fuente de verdad de arquitectura y requisitos. |
 | `ARCHIVOS.md` | ✅ Este archivo | Mapa de archivos del proyecto. Actualizar en cada sprint. |
 | `pytest.ini` | ✅ Completo | Configuración de pytest para descubrir archivos de prueba en español (`prueba_*.py`, clases `Prueba*`, funciones `prueba_*`). |
 
@@ -135,7 +134,6 @@ py-param-bim/
 ├── main.py                              # Punto de entrada
 ├── requirements.txt
 ├── pytest.ini                           # Configuración de pytest en español
-├── Claude.md                            # Contexto del proyecto para IA
 ├── ARCHIVOS.md                          # Este archivo
 └── bim_generador/
     ├── __init__.py

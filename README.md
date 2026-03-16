@@ -6,7 +6,7 @@
 [![PyQt6](https://img.shields.io/badge/PyQt6-6.6%2B-41CD52?logo=qt&logoColor=white)](https://www.riverbankcomputing.com/software/pyqt/)
 [![Tests](https://img.shields.io/badge/Tests-40%2F40%20pasando-brightgreen?logo=pytest)](pruebas/)
 [![Licencia](https://img.shields.io/badge/Licencia-MIT-blue)](LICENSE)
-[![Estado](https://img.shields.io/badge/Estado-Fase%201%20en%20desarrollo-orange)](Claude.md)
+[![Estado](https://img.shields.io/badge/Estado-Fase%201%20en%20desarrollo-orange)](README.md)
 
 ---
 

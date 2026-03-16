@@ -57,3 +57,7 @@ reportes_salida/
 
 # === Logs ===
 *.log
+
+# === Archivos internos de desarrollo / IA ===
+CLAUDE.md
+Claude.md

@@ -1,5 +1,5 @@
 """
-panel_documentacion.py — Panel stub. Ver Claude.md §3 RF-02 para la sección correspondiente.
+panel_documentacion.py — Panel stub. Ver requisitos §3 RF-02.
 Estado: STUB — implementación planificada para Fase 2.
 """
 from bim_generador.interfaz.paneles.panel_base import PanelBase
