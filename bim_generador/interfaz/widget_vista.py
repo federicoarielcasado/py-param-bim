@@ -17,10 +17,15 @@ según las claves presentes en el pv.MultiBlock recibido:
     → Pan y zoom habilitados; rotación deshabilitada.
     → Usado por: RenderizadorLote
 
-  Modo 2D unidad (clave "habitaciones"):
+  Modo 2D unidad    (clave "habitaciones"):
     → Proyección paralela, cámara cenital fija.
     → Habitaciones coloreadas por tipo con etiquetas flotantes.
     → Usado por: RenderizadorUnidad
+
+  Modo 2D ambientes (clave "habitaciones_amb"):
+    → Misma planta que el modo unidad.
+    → El ambiente seleccionado se renderiza resaltado; el resto, atenuado.
+    → Usado por: RenderizadorAmbientes
 """
 
 from __future__ import annotations
@@ -116,7 +121,10 @@ class WidgetVista(QWidget):
         self._plotter.clear()
         claves = list(multi_block.keys())
 
-        if "habitaciones" in claves:
+        if "habitaciones_amb" in claves:
+            # Vista 2D — planta con ambiente resaltado
+            self._renderizar_ambientes_2d(multi_block)
+        elif "habitaciones" in claves:
             # Vista 2D — planta esquemática de unidad
             self._renderizar_unidad_2d(multi_block)
         elif "lote_base" in claves:
@@ -353,6 +361,121 @@ class WidgetVista(QWidget):
                 )
 
         # Cámara cenital con proyección paralela
+        self._plotter.enable_parallel_projection()
+        self._plotter.view_xy()
+        self._plotter.reset_camera()
+
+    # -----------------------------------------------------------------------
+    # Modo 2D — planta con ambiente seleccionado resaltado
+    # -----------------------------------------------------------------------
+
+    def _renderizar_ambientes_2d(self, multi_block: "pv.MultiBlock") -> None:
+        """
+        Renderiza la planta 2D resaltando el ambiente seleccionado.
+
+        - Ambiente seleccionado (cell_data["seleccionado"] == 1):
+            opacidad 1.0, borde blanco grueso, color vivo.
+        - Resto de ambientes:
+            opacidad 0.35, borde atenuado.
+        - Etiquetas: solo para el ambiente seleccionado.
+        """
+        seleccionado_centroide = None
+
+        if "habitaciones_amb" in multi_block.keys():
+            habitaciones = multi_block["habitaciones_amb"]
+            for nombre in habitaciones.keys():
+                mesh = habitaciones[nombre]
+                if mesh is None or mesh.n_cells == 0:
+                    continue
+
+                tipo_int  = int(mesh.cell_data["tipo_int"][0]) if "tipo_int" in mesh.cell_data else 9
+                es_sel    = bool(mesh.cell_data["seleccionado"][0]) if "seleccionado" in mesh.cell_data else False
+                color_base = COLORES_AMBIENTE.get(tipo_int, "#3A3A4A")
+
+                if es_sel:
+                    self._plotter.add_mesh(
+                        mesh,
+                        color=color_base,
+                        opacity=1.0,
+                        show_edges=True,
+                        edge_color="#FFFFFF",
+                        line_width=3.0,
+                    )
+                    # Guardar centroide para la etiqueta
+                    pts = mesh.points
+                    seleccionado_centroide = [
+                        float(pts[:, 0].mean()),
+                        float(pts[:, 1].mean()),
+                        0.05,
+                    ]
+                else:
+                    self._plotter.add_mesh(
+                        mesh,
+                        color=color_base,
+                        opacity=0.30,
+                        show_edges=True,
+                        edge_color="#5A5A6A",
+                        line_width=0.8,
+                    )
+
+        # Etiqueta solo del ambiente seleccionado
+        if "etiquetas" in multi_block.keys():
+            etiq = multi_block["etiquetas"]
+            if etiq is not None and etiq.n_points > 0 and "tipo_int" in etiq.point_data:
+                seleccionados = etiq.point_data.get("seleccionado", None)
+                tipos_int     = etiq.point_data["tipo_int"]
+                areas_m2      = etiq.point_data.get("area_m2", None)
+
+                puntos_etiq = []
+                labels      = []
+                for i, t in enumerate(tipos_int):
+                    es_sel = bool(seleccionados[i]) if seleccionados is not None else True
+                    if not es_sel:
+                        continue
+                    nombre_amb = NOMBRES_AMBIENTE.get(int(t), "Amb")
+                    area_txt   = f"\n{areas_m2[i]:.1f}m2" if areas_m2 is not None else ""
+                    labels.append(f"{nombre_amb}{area_txt}")
+                    puntos_etiq.append(etiq.points[i])
+
+                if labels and puntos_etiq:
+                    import numpy as np
+                    self._plotter.add_point_labels(
+                        points=np.array(puntos_etiq),
+                        labels=labels,
+                        font_size=10,
+                        text_color="#FFFFFF",
+                        bold=True,
+                        show_points=False,
+                        always_visible=True,
+                    )
+
+        # Etiquetas atenuadas para ambientes no seleccionados (solo tipo)
+        if "etiquetas" in multi_block.keys():
+            etiq = multi_block["etiquetas"]
+            if etiq is not None and etiq.n_points > 0 and "tipo_int" in etiq.point_data:
+                seleccionados = etiq.point_data.get("seleccionado", None)
+                tipos_int     = etiq.point_data["tipo_int"]
+                puntos_dim    = []
+                labels_dim    = []
+                for i, t in enumerate(tipos_int):
+                    es_sel = bool(seleccionados[i]) if seleccionados is not None else False
+                    if es_sel:
+                        continue
+                    labels_dim.append(NOMBRES_AMBIENTE.get(int(t), ""))
+                    puntos_dim.append(etiq.points[i])
+
+                if labels_dim and puntos_dim:
+                    import numpy as np
+                    self._plotter.add_point_labels(
+                        points=np.array(puntos_dim),
+                        labels=labels_dim,
+                        font_size=7,
+                        text_color="#787888",
+                        bold=False,
+                        show_points=False,
+                        always_visible=True,
+                    )
+
         self._plotter.enable_parallel_projection()
         self._plotter.view_xy()
         self._plotter.reset_camera()

@@ -30,6 +30,7 @@ from bim_generador.interfaz.widget_vista      import WidgetVista
 from bim_generador.interfaz.paneles.panel_general    import PanelGeneral
 from bim_generador.interfaz.paneles.panel_lote       import PanelLote
 from bim_generador.interfaz.paneles.panel_tipologias import PanelTipologias
+from bim_generador.interfaz.paneles.panel_ambientes  import PanelAmbientes
 
 
 # Mapa: nombre visible → (clase del panel, SeccionActiva)
@@ -37,8 +38,8 @@ SECCIONES: list[tuple[str, type, SeccionActiva]] = [
     ("⚙ General",          PanelGeneral,    SeccionActiva.GENERAL),
     ("🏗 Lote",             PanelLote,       SeccionActiva.LOTE),
     ("🏠 Tipologías",       PanelTipologias, SeccionActiva.TIPOLOGIAS),
+    ("🛋 Ambientes",        PanelAmbientes,  SeccionActiva.AMBIENTES),
     # Los paneles siguientes se descomientan a medida que se implementan:
-    # ("🛋 Ambientes",      PanelUnidad,       SeccionActiva.AMBIENTES),
     # ("🚶 Circulación",   PanelCirculacion,  SeccionActiva.CIRCULACION),
     # ("🏛 Estructura",    PanelEstructura,   SeccionActiva.ESTRUCTURA),
     # ("🪟 Fachada",        PanelFachada,      SeccionActiva.FACHADA),

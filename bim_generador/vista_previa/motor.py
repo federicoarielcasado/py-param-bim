@@ -79,14 +79,16 @@ class MotorVista:
 
     def _obtener_renderizador(self, seccion: SeccionActiva):
         """Devuelve el renderizador correspondiente a la sección activa."""
-        from bim_generador.vista_previa.renderizadores.volumen import RenderizadorVolumen
-        from bim_generador.vista_previa.renderizadores.lote    import RenderizadorLote
-        from bim_generador.vista_previa.renderizadores.unidad  import RenderizadorUnidad
+        from bim_generador.vista_previa.renderizadores.volumen   import RenderizadorVolumen
+        from bim_generador.vista_previa.renderizadores.lote      import RenderizadorLote
+        from bim_generador.vista_previa.renderizadores.unidad    import RenderizadorUnidad
+        from bim_generador.vista_previa.renderizadores.ambientes import RenderizadorAmbientes
 
         mapa = {
             SeccionActiva.GENERAL:    RenderizadorVolumen(),
             SeccionActiva.LOTE:       RenderizadorLote(),
             SeccionActiva.TIPOLOGIAS: RenderizadorUnidad(),
+            SeccionActiva.AMBIENTES:  RenderizadorAmbientes(),
             # Resto de renderizadores se agregan a medida que se implementan:
             # SeccionActiva.ESTRUCTURA: RenderizadorEstructura(),
         }

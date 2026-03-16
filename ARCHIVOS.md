@@ -2,7 +2,7 @@
 
 > Este archivo se actualiza en cada sprint con los archivos nuevos o modificados.
 > Es la referencia rápida para encontrar dónde está implementada cada funcionalidad.
-> Última actualización: 13 de Marzo de 2026 | Versión: 0.3.0 (Fase 1 — Sprint 4: Panel Tipologías + Renderizador Unidad 2D)
+> Última actualización: 16 de Marzo de 2026 | Versión: 0.4.0 (Fase 1 — Sprint 5: Panel Ambientes + Renderizador Ambientes 2D)
 
 ---
 
@@ -55,6 +55,7 @@
 | `renderizadores/volumen.py` | ✅ **Implementado** | **Primer renderizador funcional.** Genera el volumen 3D del edificio como pyvista MultiBlock: plano de lote + boxes por planta (`RenderizadorVolumen`). |
 | `renderizadores/lote.py` | ✅ **Implementado** | Vista 2D cenital del lote (`RenderizadorLote`). Genera 4 capas: `lote_base`, `zona_retiros`, `zona_edificable`, `cotas`. Disparado por `SeccionActiva.LOTE`. |
 | `renderizadores/unidad.py` | ✅ **Implementado** | Planta esquemática 2D de una unidad funcional (`RenderizadorUnidad`). Layout por zonas: balcón/social/privado/servicios/circulación. Acepta `contexto={"unidad_idx": N}`. Disparado por `SeccionActiva.TIPOLOGIAS`. |
+| `renderizadores/ambientes.py` | ✅ **Implementado** | Planta 2D con resaltado de ambiente seleccionado (`RenderizadorAmbientes`). Misma geometría que `RenderizadorUnidad` pero agrega `cell_data["seleccionado"]` y `cell_data["ambiente_orig_idx"]` a cada mesh. Acepta `contexto={"unidad_idx": N, "ambiente_idx": M}`. Disparado por `SeccionActiva.AMBIENTES`. |
 | `renderizadores/estructura.py` | 🔲 Stub | Visualización de grilla estructural (`RenderizadorEstructura`). Planificado para Fase 2. |
 
 ---
@@ -69,7 +70,8 @@
 | `paneles/panel_general.py` | ✅ **Implementado** | **Panel de parámetros generales** (`PanelGeneral`). Permite editar nombre, lote y edificio con métricas en tiempo real. |
 | `paneles/panel_lote.py` | ✅ **Implementado** | Panel de Lote e Implantación (`PanelLote`). Edita dimensiones del lote, retiros y normativa. Muestra métricas de implantación con semáforo visual de cumplimiento FOS/FOT. |
 | `paneles/panel_tipologias.py` | ✅ **Implementado** | Panel de Tipologías de Unidades (`PanelTipologias`). Lista editable de unidades por planta (combo+quitar), botón agregar, spinner de previsualización, métricas de planta tipo. Expone `contexto_render` con `{"unidad_idx": N}`. |
-| `paneles/panel_unidad.py` | 🔲 Stub | Panel de Ambientes (`PanelUnidad`). Planificado para Sprint 5. |
+| `paneles/panel_ambientes.py` | ✅ **Implementado** | Panel de Edición de Ambientes (`PanelAmbientes`). Selección de unidad + ambiente, edición de superficie y ancho mínimo, validación normativa inline con semáforo verde/amarillo/rojo, métricas de unidad. Expone `contexto_render` con `{"unidad_idx": N, "ambiente_idx": M}`. |
+| `paneles/panel_unidad.py` | 🔲 Stub | Stub vacío (reemplazado por `panel_ambientes.py`). |
 | `paneles/panel_circulacion.py` | 🔲 Stub | Panel de Circulación (`PanelCirculacion`). Planificado para Fase 2. |
 | `paneles/panel_estructura.py` | 🔲 Stub | Panel de Estructura (`PanelEstructura`). Planificado para Fase 2. |
 | `paneles/panel_fachada.py` | 🔲 Stub | Panel de Fachada (`PanelFachada`). Planificado para Fase 2. |
@@ -112,6 +114,7 @@
 | `prueba_validador.py` | ✅ **Implementado** | Pruebas del validador normativo. Cubre carga de perfil, validación FOS/FOT y superficies mínimas. |
 | `prueba_renderizadores.py` | ✅ **Implementado** | Pruebas de los renderizadores de vista previa. Cubre: `RenderizadorVolumen` (claves, geometría, retiros), `RenderizadorLote` (capas, dimensiones, casos borde) y `MotorVista` (despacho por sección, compatibilidad con contexto). |
 | `prueba_tipologias.py` | ✅ **Implementado** | Pruebas del Sprint 4. Cubre: `RenderizadorUnidad` (claves, habitaciones, etiquetas tipo_int/area_m2, casos borde), selección por contexto y `MotorVista` con contexto. |
+| `prueba_ambientes.py` | ✅ **Implementado** | Pruebas del Sprint 5. Cubre: `RenderizadorAmbientes` (estructura MultiBlock, cell_data, invariante exactamente-uno-seleccionado, casos borde con índices fuera de rango) y `MotorVista` con `SeccionActiva.AMBIENTES`. |
 
 ---
 
@@ -151,6 +154,7 @@ py-param-bim/
     │       ├── volumen.py               ← Implementado ✅
     │       ├── lote.py                  ← Implementado ✅
     │       ├── unidad.py                ← Implementado ✅
+    │       ├── ambientes.py             ← Implementado ✅
     │       └── estructura.py            ← Stub
     ├── revit/
     │   ├── exportador.py                ← Stub (Fase 3)
@@ -163,6 +167,7 @@ py-param-bim/
     │       ├── panel_general.py         ← Implementado ✅
     │       ├── panel_lote.py            ← Implementado ✅
     │       ├── panel_tipologias.py      ← Implementado ✅
+    │       ├── panel_ambientes.py       ← Implementado ✅
     │       ├── panel_unidad.py          ← Stub
     │       ├── panel_circulacion.py     ← Stub
     │       ├── panel_estructura.py      ← Stub
@@ -180,5 +185,6 @@ py-param-bim/
     ├── prueba_motor_parametros.py       ← Implementado ✅
     ├── prueba_validador.py              ← Implementado ✅
     ├── prueba_renderizadores.py         ← Implementado ✅
-    └── prueba_tipologias.py             ← Implementado ✅
+    ├── prueba_tipologias.py             ← Implementado ✅
+    └── prueba_ambientes.py              ← Implementado ✅
 ```
