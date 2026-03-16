@@ -58,7 +58,7 @@ Sistema de generación paramétrica de edificios residenciales para Autodesk Rev
 **Requisitos previos**
 - Windows 10/11
 - Python 3.10 o superior
-- Autodesk Revit 2022+ con licencia activa *(solo para exportación — Fase 3)*
+- Autodesk Revit 2020+ con licencia activa *(solo para exportación — Fase 3; verificado con Revit 2020)*
 
 **Pasos**
 
@@ -334,12 +334,12 @@ python -m pytest pruebas/ --cov=bim_generador --cov-report=term-missing
 
 | Módulo de prueba | Clases cubiertas | Pruebas | Estado |
 |---|---|---|---|
-| `prueba_motor_parametros.py` | `Ambiente`, `Unidad`, `Planta`, `Lote`, `Edificio`, `Proyecto` | 44 | ✅ 44/44 |
+| `prueba_motor_parametros.py` | `Ambiente`, `Unidad`, `Planta`, `Lote`, `Edificio`, `Proyecto` | 34 | ✅ 34/34 |
 | `prueba_validador.py` | `Validador`, `ResultadoValidacion` | 6 | ✅ 6/6 |
-| `prueba_renderizadores.py` | `RenderizadorVolumen`, `RenderizadorLote`, `MotorVista` | 34 | ✅ 34/34 |
+| `prueba_renderizadores.py` | `RenderizadorVolumen`, `RenderizadorLote`, `MotorVista` | 18 | ✅ 18/18 |
 | `prueba_tipologias.py` | `RenderizadorUnidad`, `MotorVista` (contexto) | 26 | ✅ 26/26 |
 | `prueba_ambientes.py` | `RenderizadorAmbientes`, `MotorVista` (selección) | 26 | ✅ 26/26 |
-| **Total** | | **136** | **✅ 136/136** |
+| **Total** | | **110** | **✅ 110/110** |
 
 Casos de validación cubiertos:
 

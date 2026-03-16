@@ -59,5 +59,6 @@ reportes_salida/
 *.log
 
 # === Archivos internos de desarrollo / IA ===
+# Documentos de contexto para agentes de IA — no versionar
 CLAUDE.md
 Claude.md
