@@ -12,7 +12,7 @@ renderizador correspondiente a la sección activa (RF-02).
 
 from __future__ import annotations
 from enum import Enum
-from typing import TYPE_CHECKING, Optional, Callable, Dict
+from typing import TYPE_CHECKING, Optional, Callable
 
 if TYPE_CHECKING:
     from bim_generador.nucleo.motor_parametros import Proyecto
@@ -64,7 +64,8 @@ class MotorVista:
             proyecto: Proyecto actual.
             seccion:  Sección del panel activo.
             contexto: Diccionario de contexto adicional para el renderizador
-                      (p.ej. {"unidad_idx": 1} para RenderizadorUnidad).
+                      (p.ej. {"unidad_idx": 1} para RenderizadorUnidad,
+                             {"planta_idx": 2} para RenderizadorCirculacion).
         """
         self._proyecto = proyecto
         self._seccion  = seccion
@@ -79,17 +80,19 @@ class MotorVista:
 
     def _obtener_renderizador(self, seccion: SeccionActiva):
         """Devuelve el renderizador correspondiente a la sección activa."""
-        from bim_generador.vista_previa.renderizadores.volumen   import RenderizadorVolumen
-        from bim_generador.vista_previa.renderizadores.lote      import RenderizadorLote
-        from bim_generador.vista_previa.renderizadores.unidad    import RenderizadorUnidad
-        from bim_generador.vista_previa.renderizadores.ambientes import RenderizadorAmbientes
+        from bim_generador.vista_previa.renderizadores.volumen    import RenderizadorVolumen
+        from bim_generador.vista_previa.renderizadores.lote       import RenderizadorLote
+        from bim_generador.vista_previa.renderizadores.unidad     import RenderizadorUnidad
+        from bim_generador.vista_previa.renderizadores.ambientes  import RenderizadorAmbientes
+        from bim_generador.vista_previa.renderizadores.circulacion import RenderizadorCirculacion
+        from bim_generador.vista_previa.renderizadores.estructura  import RenderizadorEstructura
 
         mapa = {
-            SeccionActiva.GENERAL:    RenderizadorVolumen(),
-            SeccionActiva.LOTE:       RenderizadorLote(),
-            SeccionActiva.TIPOLOGIAS: RenderizadorUnidad(),
-            SeccionActiva.AMBIENTES:  RenderizadorAmbientes(),
-            # Resto de renderizadores se agregan a medida que se implementan:
-            # SeccionActiva.ESTRUCTURA: RenderizadorEstructura(),
+            SeccionActiva.GENERAL:     RenderizadorVolumen(),
+            SeccionActiva.LOTE:        RenderizadorLote(),
+            SeccionActiva.TIPOLOGIAS:  RenderizadorUnidad(),
+            SeccionActiva.AMBIENTES:   RenderizadorAmbientes(),
+            SeccionActiva.CIRCULACION: RenderizadorCirculacion(),
+            SeccionActiva.ESTRUCTURA:  RenderizadorEstructura(),
         }
         return mapa.get(seccion)

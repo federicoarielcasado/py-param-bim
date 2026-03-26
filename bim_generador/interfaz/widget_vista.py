@@ -5,27 +5,32 @@ Widget PyQt6 que embebe el visualizador pyvista/VTK en la ventana principal.
 
 Se actualiza automáticamente cuando el MotorVista dispara al_cambiar.
 
-Soporta tres modos de visualización que se configuran automáticamente
+Soporta los siguientes modos de visualización, detectados automáticamente
 según las claves presentes en el pv.MultiBlock recibido:
 
-  Modo 3D       (clave "plantas"):
+  Modo 3D              (clave "plantas"):
     → Perspectiva. Rotación, zoom, pan libre.
     → Usado por: RenderizadorVolumen
 
-  Modo 2D lote  (clave "lote_base"):
+  Modo 2D lote         (clave "lote_base"):
     → Proyección paralela, cámara cenital fija.
-    → Pan y zoom habilitados; rotación deshabilitada.
     → Usado por: RenderizadorLote
 
-  Modo 2D unidad    (clave "habitaciones"):
-    → Proyección paralela, cámara cenital fija.
-    → Habitaciones coloreadas por tipo con etiquetas flotantes.
+  Modo 2D unidad       (clave "habitaciones"):
+    → Planta esquemática del departamento con etiquetas.
     → Usado por: RenderizadorUnidad
 
-  Modo 2D ambientes (clave "habitaciones_amb"):
-    → Misma planta que el modo unidad.
-    → El ambiente seleccionado se renderiza resaltado; el resto, atenuado.
+  Modo 2D ambientes    (clave "habitaciones_amb"):
+    → Planta con ambiente seleccionado resaltado.
     → Usado por: RenderizadorAmbientes
+
+  Modo 2D circulación  (clave "planta_circulacion"):
+    → Planta del piso con unidades, pasillo y núcleo vertical.
+    → Usado por: RenderizadorCirculacion
+
+  Modo 2D estructura   (clave "grilla_estructura"):
+    → Grilla estructural con columnas y vigas.
+    → Usado por: RenderizadorEstructura
 """
 
 from __future__ import annotations
@@ -47,6 +52,24 @@ COLORES_PLANTAS = [
     "#4A90D9", "#5BA85F", "#E8A838", "#D95F5F",
     "#9B6BD4", "#4DBFBF", "#D96CB0", "#8B6F47",
 ]
+
+# Paleta de colores para tipologías de unidades (índice = _TIPOLOGIA_A_INT)
+COLORES_TIPOLOGIA = {
+    0: "#C89030",   # monoambiente    — ámbar
+    1: "#3A6FA0",   # 2 ambientes     — azul
+    2: "#3A7040",   # 3 ambientes     — verde
+    3: "#703A90",   # 4 ambientes     — violeta
+    4: "#904040",   # dúplex          — rojo
+}
+
+# Nombres visibles para etiquetas de tipologías
+NOMBRES_TIPOLOGIA = {
+    0: "Mono",
+    1: "2 amb.",
+    2: "3 amb.",
+    3: "4 amb.",
+    4: "Duplex",
+}
 
 # Paleta de colores por tipo de ambiente (índice = TIPO_A_INT)
 COLORES_AMBIENTE = {
@@ -130,6 +153,12 @@ class WidgetVista(QWidget):
         elif "lote_base" in claves:
             # Vista 2D — planta de implantación del lote
             self._renderizar_lote_2d(multi_block)
+        elif "planta_circulacion" in claves:
+            # Vista 2D — planta del piso con unidades y circulación
+            self._renderizar_circulacion_2d(multi_block)
+        elif "grilla_estructura" in claves:
+            # Vista 2D — grilla estructural con columnas y vigas
+            self._renderizar_estructura_2d(multi_block)
         else:
             # Vista 3D — volumen del edificio
             self._renderizar_volumen_3d(multi_block)
@@ -475,6 +504,175 @@ class WidgetVista(QWidget):
                         show_points=False,
                         always_visible=True,
                     )
+
+        self._plotter.enable_parallel_projection()
+        self._plotter.view_xy()
+        self._plotter.reset_camera()
+
+    # -----------------------------------------------------------------------
+    # Modo 2D — planta del piso con unidades y circulación
+    # -----------------------------------------------------------------------
+
+    def _renderizar_circulacion_2d(self, multi_block: "pv.MultiBlock") -> None:
+        """
+        Renderiza la planta del piso con unidades coloreadas por tipología,
+        pasillo central y núcleo vertical.
+        """
+        # Contorno de la planta
+        if "contorno" in multi_block.keys():
+            m = multi_block["contorno"]
+            if m is not None and m.n_cells > 0:
+                self._plotter.add_mesh(
+                    m,
+                    color="#1A1A2A",
+                    opacity=0.6,
+                    show_edges=True,
+                    edge_color="#5A7AB8",
+                    line_width=2.0,
+                )
+
+        # Núcleo vertical
+        if "core" in multi_block.keys():
+            m = multi_block["core"]
+            if m is not None and m.n_cells > 0:
+                self._plotter.add_mesh(
+                    m,
+                    color="#2A2A3A",
+                    opacity=0.95,
+                    show_edges=True,
+                    edge_color="#8090B0",
+                    line_width=1.5,
+                )
+                pts = m.points
+                cx  = float(pts[:, 0].mean())
+                cy  = float(pts[:, 1].mean())
+                self._plotter.add_point_labels(
+                    points=[[cx, cy, 0.05]],
+                    labels=["Núcleo"],
+                    font_size=8,
+                    text_color="#8090C0",
+                    bold=False,
+                    show_points=False,
+                    always_visible=True,
+                )
+
+        # Pasillo
+        if "pasillo" in multi_block.keys():
+            m = multi_block["pasillo"]
+            if m is not None and m.n_cells > 0:
+                self._plotter.add_mesh(
+                    m,
+                    color="#252535",
+                    opacity=0.7,
+                    show_edges=True,
+                    edge_color="#6A8AB0",
+                    line_width=1.0,
+                )
+
+        # Unidades — coloreadas por tipología
+        if "unidades" in multi_block.keys():
+            unidades_mb = multi_block["unidades"]
+            for nombre in unidades_mb.keys():
+                mesh = unidades_mb[nombre]
+                if mesh is None or mesh.n_cells == 0:
+                    continue
+                tip_int = int(mesh.cell_data["tipologia_int"][0]) \
+                    if "tipologia_int" in mesh.cell_data else 1
+                color = COLORES_TIPOLOGIA.get(tip_int, "#3A5A8A")
+                self._plotter.add_mesh(
+                    mesh,
+                    color=color,
+                    opacity=0.80,
+                    show_edges=True,
+                    edge_color="#C8D0E0",
+                    line_width=1.5,
+                )
+
+        # Etiquetas de unidades
+        if "etiquetas" in multi_block.keys():
+            etiq = multi_block["etiquetas"]
+            if etiq is not None and etiq.n_points > 0 \
+                    and "tipologia_int" in etiq.point_data:
+                tips    = etiq.point_data["tipologia_int"]
+                sups    = etiq.point_data.get("superficie_m2", None)
+                labels  = []
+                for i, t in enumerate(tips):
+                    nombre_tip = NOMBRES_TIPOLOGIA.get(int(t), "Unidad")
+                    sup_txt    = f"\n{sups[i]:.0f} m²" if sups is not None else ""
+                    labels.append(f"{nombre_tip}{sup_txt}")
+                self._plotter.add_point_labels(
+                    points=etiq.points,
+                    labels=labels,
+                    font_size=8,
+                    text_color="#FFFFFF",
+                    bold=False,
+                    show_points=False,
+                    always_visible=True,
+                )
+
+        self._plotter.enable_parallel_projection()
+        self._plotter.view_xy()
+        self._plotter.reset_camera()
+
+    # -----------------------------------------------------------------------
+    # Modo 2D — grilla estructural
+    # -----------------------------------------------------------------------
+
+    def _renderizar_estructura_2d(self, multi_block: "pv.MultiBlock") -> None:
+        """
+        Renderiza la grilla estructural en planta:
+        contorno, líneas de grilla y cuadrados de columnas.
+        """
+        # Contorno de la planta
+        if "contorno" in multi_block.keys():
+            m = multi_block["contorno"]
+            if m is not None and m.n_cells > 0:
+                self._plotter.add_mesh(
+                    m,
+                    color="#1A2A1A",
+                    opacity=0.5,
+                    show_edges=True,
+                    edge_color="#5A8A5A",
+                    line_width=2.0,
+                )
+
+        # Líneas de grilla X (verticales en planta)
+        if "grilla_x" in multi_block.keys():
+            m = multi_block["grilla_x"]
+            if m is not None and m.n_points > 0:
+                self._plotter.add_mesh(
+                    m,
+                    color="#2A4A2A",
+                    line_width=1.0,
+                    opacity=0.6,
+                )
+
+        # Líneas de grilla Y (horizontales en planta)
+        if "grilla_y" in multi_block.keys():
+            m = multi_block["grilla_y"]
+            if m is not None and m.n_points > 0:
+                self._plotter.add_mesh(
+                    m,
+                    color="#2A4A2A",
+                    line_width=1.0,
+                    opacity=0.6,
+                )
+
+        # Columnas — cuadrados a escala
+        if "columnas" in multi_block.keys():
+            columnas_mb = multi_block["columnas"]
+            for nombre in columnas_mb.keys():
+                mesh = columnas_mb[nombre]
+                if mesh is None or mesh.n_cells == 0:
+                    continue
+                self._plotter.add_mesh(
+                    mesh,
+                    color="#5A8A5A",
+                    opacity=0.95,
+                    show_edges=True,
+                    edge_color="#8ABA8A",
+                    line_width=1.0,
+                )
 
         self._plotter.enable_parallel_projection()
         self._plotter.view_xy()

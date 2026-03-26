@@ -181,13 +181,31 @@ class PruebaMotorVista:
         assert len(resultados) == 1
         assert "lote_base" in resultados[0].keys()
 
+    def prueba_estructura_llama_callback(self, proyecto_simple):
+        """SeccionActiva.ESTRUCTURA debe usar RenderizadorEstructura (Sprint 6)."""
+        resultados = []
+        motor = MotorVista()
+        motor.al_cambiar = lambda geom: resultados.append(geom)
+        motor.actualizar(proyecto_simple, SeccionActiva.ESTRUCTURA)
+        assert len(resultados) == 1
+        assert "grilla_estructura" in resultados[0].keys()
+
+    def prueba_circulacion_llama_callback(self, proyecto_simple):
+        """SeccionActiva.CIRCULACION debe usar RenderizadorCirculacion (Sprint 6)."""
+        resultados = []
+        motor = MotorVista()
+        motor.al_cambiar = lambda geom: resultados.append(geom)
+        motor.actualizar(proyecto_simple, SeccionActiva.CIRCULACION)
+        assert len(resultados) == 1
+        assert "planta_circulacion" in resultados[0].keys()
+
     def prueba_seccion_sin_renderizador_no_llama_callback(self, proyecto_simple):
         """Secciones sin renderizador implementado no deben llamar al callback."""
         resultados = []
         motor = MotorVista()
         motor.al_cambiar = lambda geom: resultados.append(geom)
-        # ESTRUCTURA todavía no tiene renderizador (Fase 2)
-        motor.actualizar(proyecto_simple, SeccionActiva.ESTRUCTURA)
+        # MATERIALES todavía no tiene renderizador (Fase 2)
+        motor.actualizar(proyecto_simple, SeccionActiva.MATERIALES)
         assert len(resultados) == 0
 
     def prueba_sin_callback_no_lanza_error(self, proyecto_simple):
